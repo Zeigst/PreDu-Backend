@@ -16,5 +16,11 @@ def create_session():
     Session = sessionmaker(bind=engine)
     return Session()
 
+def get_session():
+    session = create_session()
+    try:
+        yield session
+    finally:
+        session.close()
 
 init_db()

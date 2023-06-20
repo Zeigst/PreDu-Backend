@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 from typing import Union
 from passlib.context import CryptContext
+from sqlalchemy.orm import Session
 
 import jwt
 
@@ -34,7 +35,7 @@ def create_access_token(data: dict, expires_delta: Union[timedelta, None] = None
 def decode_token(token: str):
     return jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
 
-def login(session, username, password):
+def encode_token(session: Session, username: str, password: str):
     user: User = session.query(User).filter_by(username=username).first()
     if user:
         if not verify_password(password, user.password):
@@ -44,6 +45,8 @@ def login(session, username, password):
                 "id": f"{user.id}",
                 "fullname": f"{user.fullname}",
                 "username": f"{user.username}",
+                "phone": f"{user.phone}",
+                "email": f"{user.email}",
                 "is_admin": user.is_admin,
                 "is_active": user.is_active
             }

@@ -1,19 +1,20 @@
 from models import *
+from sqlalchemy.orm import Session
 import re
 from services import auth
 
 
-def change_password(session, username, password, newpassword, confirmpassword):
-    if newpassword != confirmpassword:
+def change_password(session: Session, user: User, current_password: str, new_password: str , confirm_password: str):
+    if new_password != confirm_password:
         return (False, "Incorrrect confirmation of new password")
-    user = session.query(User).filter_by(username=username).first()
-    if not auth.verify_password(password, user.password):
+    user = session.query(User).filter_by(username=user.username).first()
+    if not auth.verify_password(current_password, user.password):
         return (False, "Incorrect Password")
-    elif password == newpassword:
+    elif current_password == new_password:
         return (False, "New password must be different from current password")
     else:
-        newpasswordhash = auth.get_password_hash(newpassword)
-        user.password = newpasswordhash
+        new_password_hashed = auth.get_password_hash(new_password)
+        user.password = new_password_hashed
         session.commit()
         return (True, "Change Successful")
 

@@ -1,6 +1,6 @@
 from datetime import timedelta
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Float, Boolean
+from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Float, Boolean, VARCHAR
 from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
 
@@ -13,13 +13,16 @@ class User(Base):
     username = Column(String(200), nullable=False)
     password = Column(String(1000), nullable=False)
     fullname = Column(String(200), nullable=False)
+    phone = Column(VARCHAR(10))
+    email = Column(VARCHAR(50))
     is_admin = Column(Boolean, nullable=False)
-    is_active = Column(Boolean, nullable=False) 
+    is_active = Column(Boolean, nullable=False)
+
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 
     orders = relationship('Order', back_populates='user')
-    used_coupons = relationship('Coupon', back_populates='user')
+    used_coupons = relationship('UsedCoupon', back_populates='user')
 
 
 class Category(Base):
@@ -32,7 +35,7 @@ class Category(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 
-    products = relationship('Product', back_populates="category")
+    products = relationship("Product", back_populates="category")
 
 
 class Brand(Base):
@@ -45,15 +48,15 @@ class Brand(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 
-    products = relationship('Product', back_populates="brand")
+    products = relationship("Product", back_populates="brand")
 
 
 class Product(Base):
     __tablename__ = 'products'
     
     id = Column(Integer, primary_key=True)
-    category_id = Column(Integer, ForeignKey('categories.id'))
-    brand_id = Column(Integer, ForeignKey('brands.id'))
+    category_id = Column(Integer, ForeignKey("categories.id"))
+    brand_id = Column(Integer, ForeignKey("brands.id"))
     name = Column(String(200), nullable=False)
     description = Column(String(1000), nullable=False)
     cost_per_unit = Column(Float, nullable=False)
@@ -63,8 +66,8 @@ class Product(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 
-    category = relationship('Category')
-    brand = relationship('Brand')
+    category = relationship("Category", back_populates="products")
+    brand = relationship("Brand", back_populates="products")
     ordered_products = relationship('OrderedProduct', back_populates="product")
 
 
@@ -103,10 +106,10 @@ class Order(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 
-    user = relationship('User')
-    coupon = relationship('Coupon')
-    used_coupon = relationship('UsedCoupon')
+    user = relationship('User', back_populates="orders")
+    coupon = relationship('Coupon', back_populates="orders")
     ordered_products = relationship('OrderedProduct', back_populates='order')
+    used_coupon = relationship('UsedCoupon', back_populates='order')
 
 
 class OrderedProduct(Base):
@@ -121,8 +124,8 @@ class OrderedProduct(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 
-    order = relationship('Order')
-    product = relationship('Product')
+    order = relationship('Order', back_populates="ordered_products")
+    product = relationship('Product', back_populates="ordered_products")
 
 
 class UsedCoupon(Base):
@@ -136,9 +139,9 @@ class UsedCoupon(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 
-    coupon = relationship('Coupon')
-    user = relationship('User')
-    order = relationship('Order')
+    user = relationship('User', back_populates="used_coupons")
+    coupon = relationship('Coupon', back_populates="used_coupons")
+    order = relationship('Order', back_populates="used_coupon")
 
 
 class News(Base):
