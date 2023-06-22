@@ -1,4 +1,5 @@
 from models import *
+from services.auth import get_password_hash
 from sqlalchemy.orm import Session
 from database import create_session
 
@@ -61,6 +62,8 @@ def seedBrands(session: Session):
             new_brand = Brand(name=brand["name"], description=brand["description"])
             session.add(new_brand)
     session.commit()
+
+
 
 # ===== PRODUCTS ===== #
 products = [
@@ -154,10 +157,121 @@ products = [
         "image": "https://drive.google.com/uc?export=view&id=1ndEiq9Gi4cuxlxHQN0ARd9GFOoH-JEF9",
         "stock_quantity": 200
     },
+    {
+        "category_id": 1,
+        "brand_id": 4,
+        "name": "Bartleby 3 Month Combo",
+        "description": "For 1 User, 3 Month",
+        "cost_per_unit": 159000,
+        "image": "https://drive.google.com/uc?export=view&id=1ndEiq9Gi4cuxlxHQN0ARd9GFOoH-JEF9",
+        "stock_quantity": 200
+    },
+    {
+        "category_id": 1,
+        "brand_id": 4,
+        "name": "Bartleby 6 Month Combo",
+        "description": "For 1 User, 6 Month",
+        "cost_per_unit": 259000,
+        "image": "https://drive.google.com/uc?export=view&id=1ndEiq9Gi4cuxlxHQN0ARd9GFOoH-JEF9",
+        "stock_quantity": 200
+    },
+    {
+        "category_id": 3,
+        "brand_id": 5,
+        "name": "Canva 1 Month",
+        "description": "For 1 User, 1 Month",
+        "cost_per_unit": 29000,
+        "image": "https://drive.google.com/uc?export=view&id=1Mgvd3WZ6RKDTJU75zzFKJ-4XRIzUH0ay",
+        "stock_quantity": 200
+    },
+    {
+        "category_id": 3,
+        "brand_id": 5,
+        "name": "Canva 2 Month",
+        "description": "For 1 User, 2 Month",
+        "cost_per_unit": 49000,
+        "image": "https://drive.google.com/uc?export=view&id=1Mgvd3WZ6RKDTJU75zzFKJ-4XRIzUH0ay",
+        "stock_quantity": 200
+    },
+    {
+        "category_id": 3,
+        "brand_id": 5,
+        "name": "Canva 3 Month",
+        "description": "For 1 User, 4 Month",
+        "cost_per_unit": 59000,
+        "image": "https://drive.google.com/uc?export=view&id=1Mgvd3WZ6RKDTJU75zzFKJ-4XRIzUH0ay",
+        "stock_quantity": 200
+    },
 ]
 
+def seedProducts(session: Session):
+    for product in products:
+        existed_product = session.query(Product).filter_by(name=product["name"]).first()
+        if not existed_product:
+            new_product = Product(category_id=product["category_id"], brand_id=product["brand_id"], name=product["name"],
+                                    description=product["description"], cost_per_unit=product["cost_per_unit"], image=product["image"],
+                                    stock_quantity=product["stock_quantity"])
+            session.add(new_product)
+    session.commit()
+
+
+
+# ===== USERS ===== #
+def seedUsers(session: Session):
+    admin = session.query(User).filter_by(username="admin").first()
+    if  not admin:
+        admin = User(username="admin", fullname="admin",password=get_password_hash("admin"), 
+                        phone="0911223333", email="admin@mail.com" ,is_admin=True, is_active=True)
+        session.add(admin)
+        session.commit()
+    
+    user = session.query(User).filter_by(username="user").first()
+    if  not user:
+        user = User(username="user", fullname="user",password=get_password_hash("user"), 
+                        phone="0944556666", email="user@mail.com", is_admin=False, is_active=True)
+        session.add(user)
+        session.commit()
+
+
+
+# ===== COUPONS ===== #
+coupons = [
+    {
+        "code": "WELCOMEPREDU",
+        "type": 2, # 1 = fixed, 2 = percentage, 3 = both
+        "fixed_amount": 0,
+        "percentage_amount": 10,
+        "minimum_order": 100000,
+        "maximum_discount": 15000,
+        "quantity": 10,
+        "is_active": True
+    },
+    {
+        "code": "PREDU20K",
+        "type": 1, # 1 = fixed, 2 = percentage, 3 = both
+        "fixed_amount": 20000,
+        "percentage_amount": 0,
+        "minimum_order": 200000,
+        "maximum_discount": 20000,
+        "quantity": 10,
+        "is_active": True
+    }
+]
+
+def seedCoupons(session: Session):
+    for coupon in coupons:
+        existed_coupon = session.query(Coupon).filter_by(code=coupon["code"]).first()
+        if not existed_coupon:
+            new_coupon = Coupon(code=coupon["code"], type=coupon["type"], fixed_amount=coupon["fixed_amount"],
+                                    percentage_amount=coupon["percentage_amount"], minimum_order=coupon["minimum_order"],
+                                    maximum_discount=coupon["maximum_discount"], quantity=coupon["quantity"], is_active=coupon["is_active"],)
+            session.add(new_coupon)
+    session.commit()
 
 
 
 seedCategories(session)
 seedBrands(session)
+seedProducts(session)
+seedCoupons(session)
+seedUsers(session)
