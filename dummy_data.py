@@ -221,14 +221,14 @@ def seedUsers(session: Session):
     admin = session.query(User).filter_by(username="admin").first()
     if  not admin:
         admin = User(username="admin", fullname="admin",password=get_password_hash("admin"), 
-                        phone="0911223333", email="admin@mail.com" ,is_admin=True, is_active=True)
+                        phone="0911223333", email="admin@mail.com", location="Admin Home" ,is_admin=True, is_active=True)
         session.add(admin)
         session.commit()
     
     user = session.query(User).filter_by(username="user").first()
     if  not user:
         user = User(username="user", fullname="user",password=get_password_hash("user"), 
-                        phone="0944556666", email="user@mail.com", is_admin=False, is_active=True)
+                        phone="0944556666", email="user@mail.com", location="User Home", is_admin=False, is_active=True)
         session.add(user)
         session.commit()
 
@@ -244,6 +244,7 @@ coupons = [
         "minimum_order": 100000,
         "maximum_discount": 15000,
         "quantity": 10,
+        "limit_per_user": 10,
         "is_active": True
     },
     {
@@ -254,6 +255,7 @@ coupons = [
         "minimum_order": 200000,
         "maximum_discount": 20000,
         "quantity": 10,
+        "limit_per_user": 5,
         "is_active": True
     }
 ]
@@ -264,7 +266,8 @@ def seedCoupons(session: Session):
         if not existed_coupon:
             new_coupon = Coupon(code=coupon["code"], type=coupon["type"], fixed_amount=coupon["fixed_amount"],
                                     percentage_amount=coupon["percentage_amount"], minimum_order=coupon["minimum_order"],
-                                    maximum_discount=coupon["maximum_discount"], quantity=coupon["quantity"], is_active=coupon["is_active"],)
+                                    maximum_discount=coupon["maximum_discount"], quantity=coupon["quantity"], 
+                                    limit_per_user=coupon["limit_per_user"], is_active=coupon["is_active"],)
             session.add(new_coupon)
     session.commit()
 

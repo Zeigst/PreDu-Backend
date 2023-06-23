@@ -1,5 +1,9 @@
 from database import create_session
 
-x = ""
-if (x):
-    print("yes")
+def getx(x):
+    if x:
+        print("yes")
+    else:
+        print("no")
+
+getx(0)

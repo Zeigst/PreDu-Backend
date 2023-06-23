@@ -19,7 +19,8 @@ def change_password(session: Session, user: User, current_password: str, new_pas
         return (True, "Change Successful")
 
 
-def add_user(session, fullname, username, password, confirm_password, is_admin):
+def add_user(session: Session, fullname: str, username: str, password: str, confirm_password: str, 
+             phone: str, email: str, location: str, is_admin: bool):
     regex_user = '^[a-zA-Z0-9]+([a-zA-Z0-9](_|-| )[a-zA-Z0-9])*[a-zA-Z0-9]+$'
     if not re.search(regex_user, username):
         return (False, 'Invalid Username')
@@ -37,58 +38,51 @@ def add_user(session, fullname, username, password, confirm_password, is_admin):
         return (False, 'Username already exists')
 
     new_user = User(username=username, password=auth.get_password_hash(password), 
-        fullname=fullname, is_admin=is_admin, is_active=True)
+        fullname=fullname, phone=phone, email=email, location=location, is_admin=is_admin, is_active=True)
     session.add(new_user)
     session.commit()
     return (True, "Created {}".format(username))
 
 
-def get_user(session, user_id):
+def get_user(session: Session, user_id: int):
     user = session.query(User).filter_by(id=user_id).first()
     if (not user):
         return (False, "User does not exist")
     return (True, user)
 
 
-def get_user_by_username(session, username):
+def get_user_by_username(session: Session, username: str):
     user = session.query(User).filter_by(username=username).first()
     if (not user):
         return (False, "User does not exist")
     return (True, user)
 
 
-def get_users(session):
+def get_users(session: Session):
     users = session.query(User).all()
     return users
 
 
-def update_user(session, user_id, username, fullname):
+def update_user(session: Session, user_id: int, fullname: str, phone: str, email: str, location: str):
     user = session.query(User).filter_by(id=user_id).first()
     if not user:
         return (False, 'User does not exist')
-    if (username):
-        user_old = session.query(User).filter_by(username=username).first()
-        if not user_old:
-            return (False, 'Username already exist')
-        else:
-            user.username = username
     if (fullname):
         user.fullname = fullname
+    if (phone):
+        user.phone = phone
+    if (email):
+        user.email = email
+    if (location):
+        user.location = location
+
     session.commit()
-    return (True, "Updated {}".format(username))
+    return (True, "Updated {}".format(user.username))
 
 
-def reset_password(session, user_id, password):
-    user = session.query(User).filter_by(id=user_id).first()
-    if (not user):
-        return (False, "User does not exist")
-
-    user.password = auth.get_password_hash(password)
-    session.commit()
-    return (True, "Password reset successful")
 
 
-def delete_user(session, user_id):
+def delete_user(session: Session, user_id: int):
     user = session.query(User).filter_by(id=user_id).first()
     if not user:
         return (False, 'User does not exist')

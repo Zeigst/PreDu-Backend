@@ -14,6 +14,7 @@ class CouponOutput:
     minimum_order: float
     maximum_discount: float
     quantity: int
+    limit_per_user: int
     is_active: bool
 
     def __init__(self, coupon: Coupon):
@@ -24,4 +25,5 @@ class CouponOutput:
         self.percentage_amount = coupon.percentage_amount
         self.minimum_order = coupon.minimum_order
         self.maximum_discount = coupon.maximum_discount
+        self.limit_per_user = coupon.limit_per_user
         self.is_active = coupon.is_active

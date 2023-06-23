@@ -13,8 +13,9 @@ class User(Base):
     username = Column(String(200), nullable=False)
     password = Column(String(1000), nullable=False)
     fullname = Column(String(200), nullable=False)
-    phone = Column(VARCHAR(10))
-    email = Column(VARCHAR(50))
+    phone = Column(VARCHAR(10), nullable=False)
+    email = Column(VARCHAR(100), nullable=False)
+    location = Column(VARCHAR(200), nullable=False)
     is_admin = Column(Boolean, nullable=False)
     is_active = Column(Boolean, nullable=False)
 
@@ -83,6 +84,7 @@ class Coupon(Base):
     maximum_discount = Column(Float, nullable=False)
     quantity = Column(Integer, nullable=False)
     is_active = Column(Boolean, nullable=False)
+    limit_per_user = Column(Integer)
     
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())

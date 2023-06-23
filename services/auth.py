@@ -47,6 +47,7 @@ def encode_token(session: Session, username: str, password: str):
                 "username": f"{user.username}",
                 "phone": f"{user.phone}",
                 "email": f"{user.email}",
+                "location": f"{user.location}",
                 "is_admin": user.is_admin,
                 "is_active": user.is_active
             }
