@@ -43,22 +43,22 @@ def encode_token(session: Session, username: str, password: str):
         else:
             data = {
                 "id": f"{user.id}",
-                "fullname": f"{user.fullname}",
+                "firstname": f"{user.firstname}",
+                "lastname": f"{user.lastname}",
                 "username": f"{user.username}",
                 "phone": f"{user.phone}",
                 "email": f"{user.email}",
                 "location": f"{user.location}",
-                "is_admin": user.is_admin,
-                "is_active": user.is_active
+                "role": user.role,
             }
             return (True, create_access_token(data, timedelta(hours=48)))
     elif user == None:
         return (False, "User Not Found")
 
-def check_is_admin(session, user_id):
+def check_is_admin(session: Session, user_id):
     user = session.query(User).filter_by(id=user_id).first()
     if not user:
         return False
-    if not user.is_admin:
-        return False
-    return True
+    if user.role == "admin":
+        return True
+    return False

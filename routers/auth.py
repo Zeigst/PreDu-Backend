@@ -4,10 +4,10 @@ from sqlalchemy.orm import Session
 from database import get_session
 from models import User
 from dependencies import get_current_user
-from dtos.auth import LoginInput, LoginOutput, ChangePasswordInput, ChangePasswordOutput
+from dtos.auth import LoginInput, LoginOutput, ChangePasswordInput, ChangePasswordOutput, ChangeUsernameInput, ChangeUsernameOutput
 from dtos.users import UserOutput
 from services.auth import encode_token
-from services.users import change_password
+from services.users import change_password, change_username
 
 router = APIRouter(prefix="/api/auth", tags=["auth"])
 
@@ -32,6 +32,19 @@ async def changePassword(input: ChangePasswordInput, session: Session = Depends(
             headers={"WWW-Authenticate": "Bearer"},
         )
     return ChangePasswordOutput(message=data)
+
+@router.post("/change-username")
+async def changeUsername(input: ChangeUsernameInput, session: Session = Depends(get_session), current_user: User = Depends(get_current_user)):
+    success, data = change_username(session, current_user, input.new_username, input.password)
+    if not success:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=data,
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    return ChangeUsernameOutput(message=data)
+
+
 
 @router.get("/me")
 async def get_profile(current_user: User = Depends(get_current_user)):

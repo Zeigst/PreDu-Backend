@@ -17,3 +17,10 @@ class ChangePasswordInput(BaseModel):
 
 class ChangePasswordOutput(BaseModel):
     message: str
+
+class ChangeUsernameInput(BaseModel):
+    new_username: str
+    password:str
+
+class ChangeUsernameOutput(BaseModel):
+    message: str

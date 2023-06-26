@@ -1,6 +1,6 @@
 from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
-from routers import auth, categories, brands, products, coupons
+from routers import auth, categories, brands, products, coupons, users
 
 app = FastAPI()
 
@@ -21,7 +21,8 @@ app.include_router(categories.router)
 app.include_router(brands.router)
 app.include_router(products.router)
 app.include_router(coupons.router)
+app.include_router(users.router)
 
 @app.on_event("startup")
 async def startup():
-    print("PreDu")
+    print("\n # ========== PreDu ========== #")

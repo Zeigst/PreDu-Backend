@@ -1,9 +1,9 @@
 from database import create_session
 
-def getx(x):
-    if x:
-        print("yes")
-    else:
-        print("no")
+from services.coupons import get_all_coupons
 
-getx(0)
+session = create_session
+
+success, data = get_all_coupons(session)
+
+print(len(data))

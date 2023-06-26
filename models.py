@@ -12,12 +12,13 @@ class User(Base):
     id = Column(Integer, primary_key=True)
     username = Column(String(200), nullable=False)
     password = Column(String(1000), nullable=False)
-    fullname = Column(String(200), nullable=False)
+    firstname = Column(String(200), nullable=False)
+    lastname = Column(String(200), nullable=False)
     phone = Column(VARCHAR(10), nullable=False)
     email = Column(VARCHAR(100), nullable=False)
     location = Column(VARCHAR(200), nullable=False)
-    is_admin = Column(Boolean, nullable=False)
-    is_active = Column(Boolean, nullable=False)
+    role = Column(VARCHAR(10), nullable=False) # admin / user
+    currently_active = Column(Boolean, nullable=False)
 
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
@@ -77,12 +78,11 @@ class Coupon(Base):
 
     id = Column(Integer, primary_key=True)
     code = Column(String(1000), nullable=False)
-    type = Column(Integer, nullable=False) # 1 = fixed, 2 = percentage, 3 = both
-    fixed_amount = Column(Float, nullable=False)
-    percentage_amount = Column(Float, nullable=False)
-    minimum_order = Column(Float, nullable=False)
-    maximum_discount = Column(Float, nullable=False)
-    quantity = Column(Integer, nullable=False)
+    type = Column(String(20), nullable=False)
+    value = Column(Float, nullable=False)
+    min_order_required = Column(Float, nullable=False)
+    max_discount_applicable = Column(Float, nullable=False)
+    stock_quantity = Column(Integer, nullable=False)
     is_active = Column(Boolean, nullable=False)
     limit_per_user = Column(Integer)
     
@@ -97,9 +97,8 @@ class Order(Base):
     __tablename__ = 'orders'
 
     id = Column(Integer, primary_key=True) 
-    status = Column(Integer, nullable=False) # 1 = pending, 2 = completed, 3 = cancelled
+    status = Column(String(20), nullable=False) # processing / cancled / completed
     user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
-    applied_coupon = Column(Boolean, nullable=False) 
     coupon_id = Column(Integer, ForeignKey('coupons.id'))
     raw_total_cost = Column(Float, nullable=False)
     discounted_amount = Column(Float, nullable=False)

@@ -220,15 +220,15 @@ def seedProducts(session: Session):
 def seedUsers(session: Session):
     admin = session.query(User).filter_by(username="admin").first()
     if  not admin:
-        admin = User(username="admin", fullname="admin",password=get_password_hash("admin"), 
-                        phone="0911223333", email="admin@mail.com", location="Admin Home" ,is_admin=True, is_active=True)
+        admin = User(username="admin", firstname="admin", lastname="admin", password=get_password_hash("admin"), 
+                     phone="0911223333", email="admin@mail.com", location="Admin Home", role="admin", currently_active=True)
         session.add(admin)
         session.commit()
     
     user = session.query(User).filter_by(username="user").first()
     if  not user:
-        user = User(username="user", fullname="user",password=get_password_hash("user"), 
-                        phone="0944556666", email="user@mail.com", location="User Home", is_admin=False, is_active=True)
+        user = User(username="user", firstname="user", lastname="user", password=get_password_hash("user"), 
+                    phone="0944556666", email="user@mail.com", location="User Home", role="user", currently_active=False)
         session.add(user)
         session.commit()
 
@@ -238,23 +238,21 @@ def seedUsers(session: Session):
 coupons = [
     {
         "code": "WELCOMEPREDU",
-        "type": 2, # 1 = fixed, 2 = percentage, 3 = both
-        "fixed_amount": 0,
-        "percentage_amount": 10,
-        "minimum_order": 100000,
-        "maximum_discount": 15000,
-        "quantity": 10,
+        "type": "percentage", # 1 = fixed, 2 = percentage, 3 = both
+        "value": 10,
+        "min_order_required": 100000,
+        "max_discount_applicable": 15000,
+        "stock_quantity": 10,
         "limit_per_user": 10,
         "is_active": True
     },
     {
         "code": "PREDU20K",
-        "type": 1, # 1 = fixed, 2 = percentage, 3 = both
-        "fixed_amount": 20000,
-        "percentage_amount": 0,
-        "minimum_order": 200000,
-        "maximum_discount": 20000,
-        "quantity": 10,
+        "type": "fixed", # 1 = fixed, 2 = percentage, 3 = both
+        "value": 20000,
+        "min_order_required": 200000,
+        "max_discount_applicable": 20000,
+        "stock_quantity": 10,
         "limit_per_user": 5,
         "is_active": True
     }
@@ -264,10 +262,11 @@ def seedCoupons(session: Session):
     for coupon in coupons:
         existed_coupon = session.query(Coupon).filter_by(code=coupon["code"]).first()
         if not existed_coupon:
-            new_coupon = Coupon(code=coupon["code"], type=coupon["type"], fixed_amount=coupon["fixed_amount"],
-                                    percentage_amount=coupon["percentage_amount"], minimum_order=coupon["minimum_order"],
-                                    maximum_discount=coupon["maximum_discount"], quantity=coupon["quantity"], 
-                                    limit_per_user=coupon["limit_per_user"], is_active=coupon["is_active"],)
+            new_coupon = Coupon(code=coupon["code"], type=coupon["type"], value=coupon["value"], 
+                                min_order_required=coupon["min_order_required"],
+                                max_discount_applicable=coupon["max_discount_applicable"], 
+                                stock_quantity=coupon["stock_quantity"], limit_per_user=coupon["limit_per_user"], 
+                                is_active=coupon["is_active"],)
             session.add(new_coupon)
     session.commit()
 
