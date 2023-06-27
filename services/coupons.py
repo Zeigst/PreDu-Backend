@@ -68,16 +68,41 @@ def delete_coupon(session: Session, coupon_id: int):
     session.commit()
     return (True, "Deleted coupon {}".format(coupon_id))
 
-def validate_coupon(session: Session, coupon: Coupon, user: User, total_cost: float):
-    coupon = session.query(Coupon).filter_by(id=coupon.id).first()
+def validate_coupon(session: Session, coupon_code: str, user: User, total_cost: float):
+    if coupon_code == "":
+        return (True, "No Coupon")
+    coupon = session.query(Coupon).filter_by(code=coupon_code).first()
+    if (not coupon):
+        return (False, "ERROR: Invalid Coupon Code")
     if not coupon.is_active:
-        return (False, "This code is no longer active")
+        return (False, "ERROR: Coupon No Longer Active")
     if total_cost < coupon.min_order_required:
-        return (False, "Min spend does not reach.")
+        return (False, "ERROR: Minimum Spend Does Not Reach.")
     if coupon.stock_quantity <= 0:
-        return (False, "Coupon out of stock.")
+        return (False, "ERROR: Coupon Out Of Stock.")
     
     user = session.query(User).filter_by(id=user.id).first()
     used_coupons = session.query(UsedCoupon).filter_by(coupon_id=coupon.id, user_id=user.id).all()
+    if len(used_coupons) >= coupon.limit_per_user:
+        return (False, "ERROR: Coupon Use Reached Limit")
+    
+    return (True, "Valid Coupon")
+
+def get_discount_value(session: Session, coupon_code: str, total_cost: float):
+    if coupon_code == "":
+        return 0
+    coupon = session.query(Coupon).filter_by(code=coupon_code).first()
+    if coupon.type == "fixed":
+        discount_value = coupon.value
+    elif coupon.type == "percentage":
+        discount_value = total_cost / 100 * coupon.value
+    
+    if discount_value >= coupon.max_discount_applicable:
+        discount_value = coupon.max_discount_applicable
+    
+    if discount_value >= total_cost:
+        discount_value = total_cost
+
+    return discount_value
 
     
