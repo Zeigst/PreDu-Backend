@@ -19,4 +19,4 @@ async def make_order(input: OrderInput, session: Session = Depends(get_session),
             detail=data,
             headers={"WWW-Authenticate": "Bearer"},
         )
-    return "Order Pending"
+    return data

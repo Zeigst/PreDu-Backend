@@ -1,5 +1,6 @@
 from models import User
 from pydantic import BaseModel
+from typing import Optional
 
 class UserOutput:
     id: int
@@ -33,3 +34,9 @@ class UserSignupInput(BaseModel):
     email: str
     location: str
         
+class UpdateUserInput(BaseModel):
+    firstname: Optional[str]
+    lastname: Optional[str]
+    phone: Optional[str]
+    email: Optional[str]
+    location: Optional[str]
