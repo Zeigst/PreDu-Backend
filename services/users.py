@@ -10,6 +10,8 @@ def change_password(session: Session, current_user: User, current_password: str,
     user = session.query(User).filter_by(username=current_user.username).first()
     if not auth.verify_password(current_password, user.password):
         return (False, "Incorrect Password")
+    if len(new_password) < 6:
+        return (False, 'Password is too short')
     elif current_password == new_password:
         return (False, "New password must be different from current password")
     else:
@@ -20,6 +22,9 @@ def change_password(session: Session, current_user: User, current_password: str,
     
 
 def change_username(session: Session, current_user: User, new_username: str, password: str):
+    regex_username = '^[a-zA-Z0-9]+([a-zA-Z0-9](_|-| )[a-zA-Z0-9])*[a-zA-Z0-9]+$'
+    if not re.search(regex_username, new_username):
+        return (False, 'Invalid Username')
     old_user = session.query(User).filter_by(username=new_username).first()
     if old_user:
         return (False, "Username already exists")

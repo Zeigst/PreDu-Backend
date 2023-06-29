@@ -35,14 +35,15 @@ async def changePassword(input: ChangePasswordInput, session: Session = Depends(
 
 @router.post("/change-username")
 async def changeUsername(input: ChangeUsernameInput, session: Session = Depends(get_session), current_user: User = Depends(get_current_user)):
-    success, data = change_username(session, current_user, input.new_username, input.password)
-    if not success:
+    success1, data1 = change_username(session, current_user, input.new_username, input.password)
+    if not success1:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=data,
+            detail=data1,
             headers={"WWW-Authenticate": "Bearer"},
         )
-    return ChangeUsernameOutput(message=data)
+    success2, data2 = encode_token(session, input.new_username, input.password)
+    return ChangeUsernameOutput(message=data1, access_token=data2)
 
 
 

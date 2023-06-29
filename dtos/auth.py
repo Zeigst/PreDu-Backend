@@ -24,3 +24,4 @@ class ChangeUsernameInput(BaseModel):
 
 class ChangeUsernameOutput(BaseModel):
     message: str
+    access_token: str
