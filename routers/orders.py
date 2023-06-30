@@ -21,7 +21,7 @@ async def make_order(input: OrderInput, session: Session = Depends(get_session),
         )
     return data
 
-@router.get("/{user_id}")
+@router.get("/")
 async def get_orders(session: Session = Depends(get_session), current_user: User = Depends(get_current_user)):
     success, data = orders.get_orders(session, current_user)
     return data

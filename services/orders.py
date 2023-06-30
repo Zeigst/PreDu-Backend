@@ -67,7 +67,8 @@ def add_order(session: Session, current_user: User, coupon_code: str, cart: dict
     return (True, f"Add Order {order.id}")
 
 def get_orders(session: Session, current_user: User):
-    orders = session.query(Order).filter_by(user_id=3).all()
+    orders = session.query(Order).filter_by(user_id=current_user.id).all()
+    processed_orders = []
     for order in orders:
         order_json = {}
         order_json["id"] = order.id
@@ -98,4 +99,5 @@ def get_orders(session: Session, current_user: User):
             ordered_products_processed.append(ordered_product_json)
 
         order_json["ordered_products"] = ordered_products_processed
-    return (True, order_json)
+        processed_orders.append(order_json)
+    return (True, processed_orders)
