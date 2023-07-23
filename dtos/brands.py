@@ -1,4 +1,5 @@
 from pydantic import BaseModel
-class CategoryInput(BaseModel):
+
+class BrandInput(BaseModel):
     name: str
     description: str

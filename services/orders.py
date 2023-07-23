@@ -2,8 +2,8 @@ from models import *
 from sqlalchemy.orm import Session
 from services.products import get_product_by_id, check_stock
 from services.coupons import get_coupon_by_code, validate_coupon, get_discount_value
-from services.ordered_products import add_ordered_product
-from services.used_coupons import add_used_coupon
+from services.ordered_products import add_ordered_product, get_ordered_products_by_order_id
+from services.used_coupons import add_used_coupon, get_used_coupon_by_order_id
 
 
 def validate_cart(session: Session, cart: dict):
@@ -45,59 +45,131 @@ def add_order(session: Session, current_user: User, coupon_code: str, cart: dict
 
     final_cost = total_cost - discount_value
 
-    order = Order(status="processing", user_id=current_user.id, raw_total_cost=total_cost,
-                      discounted_amount=discount_value, final_total_cost=final_cost)
-
     if message == "Valid Coupon":
-        coupon = session.query(Coupon).filter_by(code=coupon_code).first()
-        order.coupon_id = coupon.id
+        applied_coupon = True
+    else:
+        applied_coupon = False
+
+    order = Order(
+        status = "processing", 
+        user_id = current_user.id,
+        
+        user_firstname = current_user.firstname,
+        user_lastname = current_user.lastname,
+        user_phone = current_user.phone,
+        user_email = current_user.email,
+        user_location = current_user.location,
+
+        applied_coupon = applied_coupon,
+        raw_total_cost = total_cost, 
+        final_total_cost = final_cost
+    )
         
     session.add(order)
     session.flush()
 
+    if message == "Valid Coupon":
+        success, coupon = get_coupon_by_code(session, coupon_code)
+        success, data = add_used_coupon(session, current_user, coupon, order, discount_value)
+
     product_ids = cart.keys()
     for product_id in product_ids:
         if cart[product_id] > 0:
-            success, data = add_ordered_product(session, order.id, product_id, cart[product_id])
+            success, product = get_product_by_id(session, product_id)
+            success, data = add_ordered_product(session, order, product, cart[product_id])
     
-    if message == "Valid Coupon":
-        success, data = add_used_coupon(session, current_user.id, order.coupon_id, order.id)
-
     session.commit()
-    return (True, f"Add Order {order.id}")
+    return (True, {"order_id": order.id, "message": f"Created Order {order.id}"})
 
-def get_orders(session: Session, current_user: User):
-    orders = session.query(Order).filter_by(user_id=current_user.id).all()
+
+def get_user_orders(session: Session, user: User):
+    orders = session.query(Order).filter_by(user_id=user.id).order_by(Order.created_at.desc()).all()
+    
     processed_orders = []
     for order in orders:
+        success, ordered_products = get_ordered_products_by_order_id(session, order.id)
+        if order.applied_coupon:
+            success, used_coupon = get_used_coupon_by_order_id(session, order.id)
+        else:
+            used_coupon = {}
+        
         order_json = {}
         order_json["id"] = order.id
-        order_json["status"] = order.status
         order_json["user_id"] = order.user_id
-        order_json["coupon_id"] = order.coupon_id
+
+        order_json["user_firstname"] = order.user_firstname
+        order_json["user_lastname"] = order.user_lastname
+        order_json["user_phone"] = order.user_phone
+        order_json["user_email"] = order.user_email
+        order_json["user_location"] = order.user_location
+        
+        order_json["status"] = order.status
+        order_json["applied_coupon"] = order.applied_coupon
         order_json["raw_total_cost"] = order.raw_total_cost
-        order_json["discounted_amount"] = order.discounted_amount
         order_json["final_total_cost"] = order.final_total_cost
-        order_json["raw_total_cost"] = order.raw_total_cost
+
+        order_json["ordered_products"] = ordered_products
+        order_json["used_coupon"] = used_coupon
+
         order_json["created_at"] = order.created_at
         order_json["updated_at"] = order.updated_at
 
-        ordered_products = session.query(OrderedProduct).filter_by(order_id=order.id).all()
-        ordered_products_processed = []
-        for ordered_product in ordered_products :
-            ordered_product_json = {}
-            ordered_product_json["id"] = ordered_product.id
-            ordered_product_json["order_id"] = ordered_product.order_id
-            ordered_product_json["product_id"] = ordered_product.product_id
-            ordered_product_json["quantity"] = ordered_product.quantity
-            ordered_product_json["total_cost"] = ordered_product.total_cost
-            ordered_product_json["created_at"] = ordered_product.created_at
-            ordered_product_json["updated_at"] = ordered_product.updated_at
-
-            product = session.query(Product).filter_by(id=ordered_product.product_id).first()
-            ordered_product_json["product"] = product
-            ordered_products_processed.append(ordered_product_json)
-
-        order_json["ordered_products"] = ordered_products_processed
         processed_orders.append(order_json)
+        
     return (True, processed_orders)
+
+
+def get_order_by_id(session: Session, user: User, order_id: int): 
+    order = session.query(Order).filter_by(id=order_id).first()
+    if not order:
+        return (False, "Order Do Not Exist")
+    if user.role != "admin":
+        if order.user_id != user.id:
+            return (False, "Invalid Credentials")
+    
+    success, ordered_products = get_ordered_products_by_order_id(session, order.id)
+    if order.applied_coupon:
+        success, used_coupon = get_used_coupon_by_order_id(session, order.id)
+    else:
+        used_coupon = {}
+    
+    order_json = {}
+    order_json["id"] = order.id
+    order_json["user_id"] = order.user_id
+
+    order_json["user_firstname"] = order.user_firstname
+    order_json["user_lastname"] = order.user_lastname
+    order_json["user_phone"] = order.user_phone
+    order_json["user_email"] = order.user_email
+    order_json["user_location"] = order.user_location
+    
+    order_json["status"] = order.status
+    order_json["applied_coupon"] = order.applied_coupon
+    order_json["raw_total_cost"] = order.raw_total_cost
+    order_json["final_total_cost"] = order.final_total_cost
+
+    order_json["ordered_products"] = ordered_products
+    order_json["used_coupon"] = used_coupon
+
+    order_json["created_at"] = order.created_at
+    order_json["updated_at"] = order.updated_at
+
+    return (True, order_json)
+
+
+def cancel_order(session: Session, user: User, order_id: int):
+    order = session.query(Order).filter_by(id=order_id).first()
+    if not order:
+        return (False, "Order Do Not Exist")
+    if user.role != "admin":
+        if user.id != order.user_id:
+            return (False, "Invalid Credentials")
+    if order.status == "canceled":
+        return (False, "Order Already Canceled")
+    if order.status == "completed":
+        return (False, "Order Already Completed")
+    
+    order.status = "canceled"
+    session.commit()
+    return (True, "Order Canceled")
+    

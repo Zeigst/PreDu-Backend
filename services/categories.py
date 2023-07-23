@@ -2,7 +2,7 @@ from models import *
 from sqlalchemy.orm import Session
 
 def get_all_categories(session: Session):
-    categories = session.query(Category).all()
+    categories = session.query(Category).order_by(Category.id.asc()).all()
     return (True, categories)
 
 def get_category_by_name(session: Session, category_name: str):
@@ -35,17 +35,20 @@ def update_category(session: Session, category_id: int, name: str, description: 
     if (name):
         old_category = session.query(Category).filter_by(name=name).first()
         if (old_category):
-            return (False, "Category name already exist")
+            return (False, "Category name already exists")
         else:
             category.name = name
     
     if (description):
         category.description = name
 
+    session.commit()
+    return (True, f"Updated Category {category_id}")
+
 def delete_category(session: Session, category_id: int):
     category = session.query(Category).filter_by(id=category_id).first()
     if not category:
-        return (False, 'User does not exist')
+        return (False, 'Category does not exist')
     session.delete(category)
     session.commit()
     return (True, "Deleted Category {}".format(category_id))

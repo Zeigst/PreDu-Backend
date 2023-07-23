@@ -81,8 +81,8 @@ def get_user_by_username(session: Session, username: str):
 
 
 def get_users(session: Session):
-    users = session.query(User).all()
-    return users
+    users = session.query(User).filter_by(role='user').all()
+    return (True, users)
 
 
 def update_user(session: Session, user_id: int, firstname: str, lastname: str, phone: str, email: str, 
@@ -114,3 +114,4 @@ def delete_user(session: Session, user_id: int):
     session.delete(user)
     session.commit()
     return (True, "Deleted User {}".format(user_id))
+

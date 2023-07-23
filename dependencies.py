@@ -25,3 +25,19 @@ async def get_current_user(token: str = Depends(oauth2_scheme), session: Session
     if user_data is None:
         raise credentials_exception
     return user_data
+
+async def authorize_admin_access(token: str = Depends(oauth2_scheme), session: Session = Depends(get_session), current_user: User = Depends(get_current_user)):
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_403_FORBIDDEN,
+        detail="Unauthorized",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+    try:
+        payload = auth.decode_token(token)
+        role: str = payload.get("role")
+        if role is None:
+            raise credentials_exception
+        elif role == "user":
+            raise credentials_exception
+    except JWTError:
+        raise credentials_exception

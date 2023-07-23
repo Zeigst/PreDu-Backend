@@ -10,8 +10,8 @@ class UserOutput:
     phone: str
     email: str
     location: str
-    is_admin: bool
-    is_active: bool
+    role: str
+    currently_active_active: bool
 
     def __init__(self, user: User):
         self.id = user.id
@@ -35,6 +35,13 @@ class UserSignupInput(BaseModel):
     location: str
         
 class UpdateUserInput(BaseModel):
+    firstname: Optional[str]
+    lastname: Optional[str]
+    phone: Optional[str]
+    email: Optional[str]
+    location: Optional[str]
+
+class UpdateAdminInput(BaseModel):
     firstname: Optional[str]
     lastname: Optional[str]
     phone: Optional[str]

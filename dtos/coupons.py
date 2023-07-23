@@ -3,7 +3,6 @@ from models import Coupon
 
 class CouponInput(BaseModel):
     code: str
-    order_value: float
 
 class CouponOutput:
     id: int

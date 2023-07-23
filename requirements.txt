@@ -1,0 +1,5 @@
+fastapi
+sqlalchemy
+jwt
+passlib
+python-jose

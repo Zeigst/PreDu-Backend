@@ -2,7 +2,7 @@ from models import *
 from sqlalchemy.orm import Session
 
 def get_all_products(session: Session):
-    products = session.query(Product).all()
+    products = session.query(Product).order_by(Product.id.asc()).all()
     return (True, products)
 
 def get_product_by_id(session: Session, product_id: int):

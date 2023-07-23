@@ -1,6 +1,9 @@
 from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
-from routers import auth, categories, brands, products, coupons, users, orders
+from routers import auth, categories, brands, products, coupons, users, orders, chatbot
+from dotenv import load_dotenv
+
+load_dotenv()
 
 app = FastAPI()
 
@@ -23,6 +26,7 @@ app.include_router(products.router)
 app.include_router(coupons.router)
 app.include_router(users.router)
 app.include_router(orders.router)
+app.include_router(chatbot.router)
 
 @app.on_event("startup")
 async def startup():

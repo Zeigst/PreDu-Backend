@@ -21,7 +21,24 @@ async def make_order(input: OrderInput, session: Session = Depends(get_session),
         )
     return data
 
-@router.get("/")
-async def get_orders(session: Session = Depends(get_session), current_user: User = Depends(get_current_user)):
-    success, data = orders.get_orders(session, current_user)
+@router.get("/{order_id}")
+async def get_order_by_id(order_id: int, session: Session = Depends(get_session), current_user: User = Depends(get_current_user)):
+    success, data = orders.get_order_by_id(session=session, user=current_user, order_id=order_id)
+    if not success:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=data,
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    return data
+
+@router.patch("/cancel-order/{order_id}")
+async def cancel_order(order_id: int, session: Session = Depends(get_session), current_user: User = Depends(get_current_user)):
+    success, data = orders.cancel_order(session=session, user=current_user, order_id=order_id)
+    if not success:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=data,
+            headers={"WWW-Authenticate": "Bearer"},
+        )
     return data
