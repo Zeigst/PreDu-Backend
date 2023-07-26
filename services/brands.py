@@ -34,13 +34,13 @@ def update_brand(session: Session, brand_id: int, name: str, description: str):
     
     if (name):
         old_brand = session.query(Brand).filter_by(name=name).first()
-        if (old_brand):
+        if (old_brand.id != brand_id):
             return (False, "Brand name already exists")
         else:
             brand.name = name
     
     if (description):
-        brand.description = name
+        brand.description = description
     session.commit()
     return (True, f"Updated Brand {brand_id}")
 

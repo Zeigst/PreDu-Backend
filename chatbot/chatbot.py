@@ -7,10 +7,13 @@ from langchain.agents.agent_toolkits import SQLDatabaseToolkit
 from langchain.llms import OpenAI
 import json
 from chatbot.templates import *
+from langchain.chains import LLMChain
+from langchain import PromptTemplate
+import asyncio
 
 
 
-def chat_layer_2(question: str, chat_history: list) -> str:
+async def chat_layer_2(question: str, chat_history: list) -> str:
     load_dotenv()
     os.environ["OPENAI_API_KEY"] = os.getenv("OPENAI_API_KEY")
 
@@ -39,7 +42,7 @@ def chat_layer_2(question: str, chat_history: list) -> str:
     )
 
     try:
-        response = agent_executor.run(PROMPT)
+        response =  agent_executor.run(PROMPT)
     except Exception as e:
         response = str(e)
         if response.startswith("Could not parse LLM output: `"):
@@ -47,7 +50,7 @@ def chat_layer_2(question: str, chat_history: list) -> str:
 	
     return response
 
-def chat_layer_1(question: str, chat_history: list) -> str:
+async def chat_layer_1(question: str, chat_history: list) -> str:
     load_dotenv()
     os.environ["OPENAI_API_KEY"] = os.getenv("OPENAI_API_KEY")  
 
@@ -55,10 +58,17 @@ def chat_layer_1(question: str, chat_history: list) -> str:
     for chat_message in chat_history:
         chat_history_string += f"\n{chat_message['sender']}: {chat_message['message']}"
 
-    PROMPT = TEMPLATE_LAYER_1.format(question=question, chat_history=chat_history_string)
     
-    llm = OpenAI(temperature=0, verbose=True)
-    response = llm.predict(PROMPT)
+    llm = OpenAI(temperature=0)
+    prompt = PromptTemplate(
+        input_variables=["question", "chat_history"],
+        template=TEMPLATE_LAYER_1
+    )
+    
+    chain = LLMChain(llm=llm, prompt=prompt)
+    
+    
+    response = await chain.arun(question=question, chat_history=chat_history_string)
     response_json = json.loads(response)
 
     return response_json

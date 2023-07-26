@@ -34,13 +34,13 @@ def update_category(session: Session, category_id: int, name: str, description: 
     
     if (name):
         old_category = session.query(Category).filter_by(name=name).first()
-        if (old_category):
+        if (old_category.id != category_id):
             return (False, "Category name already exists")
         else:
             category.name = name
     
     if (description):
-        category.description = name
+        category.description = description
 
     session.commit()
     return (True, f"Updated Category {category_id}")

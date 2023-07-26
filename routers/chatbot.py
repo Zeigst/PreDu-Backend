@@ -6,10 +6,10 @@ router = APIRouter(prefix="/api/chatbot", tags=["chatbot"])
 
 @router.post("/layer-1")
 async def chat_1(input: ChatInput):
-    response = chatbot.chat_layer_1(question=input.text, chat_history=input.chat_history)
+    response = await chatbot.chat_layer_1(question=input.text, chat_history=input.chat_history)
     return response
 
 @router.post("/layer-2")
 async def chat_1(input: ChatInput):
-    response = chatbot.chat_layer_2(question=input.text, chat_history=input.chat_history)
+    response = await chatbot.chat_layer_2(question=input.text, chat_history=input.chat_history)
     return response
