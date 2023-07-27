@@ -18,3 +18,9 @@ async def get_coupon_by_code(coupon_code: str, session: Session = Depends(get_se
             headers={"WWW-Authenticate": "Bearer"},
         )
     return CouponOutput(data)
+
+@router.get("/")
+async def get_all_coupons(session: Session = Depends(get_session)):
+    success, data = coupons.get_all_coupons(session=session)
+    return data
+

@@ -11,5 +11,5 @@ async def chat_1(input: ChatInput):
 
 @router.post("/layer-2")
 async def chat_1(input: ChatInput):
-    response = await chatbot.chat_layer_2(question=input.text, chat_history=input.chat_history)
+    response = await chatbot.chat_layer_2_async_wrapper(question=input.text, chat_history=input.chat_history)
     return response

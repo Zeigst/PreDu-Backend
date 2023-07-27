@@ -2,7 +2,7 @@ from models import *
 from sqlalchemy.orm import Session
 
 def get_all_coupons(session: Session):
-    coupons = session.query(Coupon).all()
+    coupons = session.query(Coupon).order_by(Coupon.id.asc()).all()
     return (True, coupons)
 
 def get_coupon_by_code(session: Session, coupon_code: str):
