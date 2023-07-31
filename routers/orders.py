@@ -3,10 +3,11 @@ from sqlalchemy.orm import Session
 
 from database import get_session
 from models import *
-from dtos.oders import OrderInput
+from dtos.orders import OrderInput
 from dependencies import get_current_user
 
 from services import orders
+from dependencies import *
 
 router = APIRouter(prefix="/api/orders", tags=["orders"])
 
@@ -41,4 +42,21 @@ async def cancel_order(order_id: int, session: Session = Depends(get_session), c
             detail=data,
             headers={"WWW-Authenticate": "Bearer"},
         )
+    return {"message":data}
+
+@router.patch("/complete-order/{order_id}", dependencies=[Depends(authorize_admin_access)])
+async def complete_order(order_id: int, session: Session = Depends(get_session), current_user: User = Depends(get_current_user)):
+    success, data = orders.complete_order(session=session, order_id=order_id)
+    if not success:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=data,
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    return {"message":data}
+
+
+@router.get("/", dependencies=[Depends(authorize_admin_access)])
+async def get_orders(session: Session = Depends(get_session), current_user: User = Depends(get_current_user)):
+    success, data = orders.get_orders(session=session)
     return data

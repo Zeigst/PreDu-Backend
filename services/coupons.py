@@ -18,47 +18,78 @@ def get_coupon_by_id(session: Session, coupon_id: int):
     return (True, coupon)
 
 def add_coupon(session: Session, code: str, type: str, value: float, min_order_required: float,
-               max_discount_applicable: float, stock_quantity: int, limit_per_user: int):
+               max_discount_applicable: float, stock_quantity: int, limit_per_user: int, is_active: bool):
+    if len(code)<=5:
+        return (False, "Invalid Code")
+    if type!="fixed" and type!="percentage":
+        return (False, "Invalid Type")
+    if value < 0:
+        return (False, "Invalid Value")
+    if type=="percentage" and value>100:
+        return (False, "Invalid Value")
+    if min_order_required < 0:
+        return (False, "Invalid Minimum Required")
+    if max_discount_applicable < 0:
+        return (False, "Invalid Maximum Applicable")
+    if type == "fixed" and max_discount_applicable!=value:
+        return (False, "Invalid Maximum Applicable")
+    if stock_quantity < 0:
+        return (False, "Invalid Stock")
+    if limit_per_user <= 0:
+        return (False, "Invalid Limit")
+    
     old_coupon = session.query(Coupon).filter_by(code=code).first()
     if (old_coupon):
-        return (False, 'Coupon already exists')
+        return (False, 'Coupon Code Already Exists')
     
     new_coupon = Coupon(code=code, type=type, value=value, min_order_required=min_order_required, max_discount_applicable=max_discount_applicable,
-                        stock_quantity=stock_quantity, limit_per_user=limit_per_user, is_active=False)
+                        stock_quantity=stock_quantity, limit_per_user=limit_per_user, is_active=is_active)
     session.add(new_coupon)
     session.commit()
     return (True, "Created Coupon {}".format(code))
 
 def update_coupon(session: Session, coupon_id: int, code: str, type: str, value: float, min_order_required: float,
-                  max_discount_applicable: float, stock_quantity: int, limit_per_user: int):
+                  max_discount_applicable: float, stock_quantity: int, limit_per_user: int, is_active: bool):
     coupon = session.query(Coupon).filter_by(id=coupon_id).first()
     if (not coupon):
         return (False, "Coupon does not exist")
     
-    if (code):
-        old_coupon = session.query(Coupon).filter_by(code=code).first()
-        if (old_coupon):
-            return (False, "Coupon code already exist")
-        else:
-            coupon.code = code
+    if len(code)<=5:
+        return (False, "Invalid Code")
+    if type!="fixed" and type!="percentage":
+        return (False, "Invalid Type")
+    if value < 0:
+        return (False, "Invalid Value")
+    if type=="percentage" and value>100:
+        return (False, "Invalid Value")
+    if min_order_required < 0:
+        return (False, "Invalid Minimum Required")
+    if max_discount_applicable < 0:
+        return (False, "Invalid Maximum Applicable")
+    if type == "fixed" and max_discount_applicable!=value:
+        return (False, "Invalid Maximum Applicable")
+    if stock_quantity < 0:
+        return (False, "Invalid Stock")
+    if limit_per_user <= 0:
+        return (False, "Invalid Limit")
+      
+    old_coupon = session.query(Coupon).filter_by(code=code).first()
+    if (old_coupon):
+        if old_coupon.id != coupon_id:
+            return (False, "Coupon Code Already Exist")
+    else:
+        coupon.code = code
     
-    if (type):
-        coupon.type = type
+    coupon.type = type
+    coupon.value = value
+    coupon.min_order_required = min_order_required
+    coupon.max_discount_applicable = max_discount_applicable
+    coupon.stock_quantity = stock_quantity
+    coupon.limit_per_user = limit_per_user
+    coupon.is_active = is_active
+    session.commit()
 
-    if (value):
-        coupon.value = value
-
-    if (min_order_required):
-        coupon.min_order_required = min_order_required
-
-    if (max_discount_applicable):
-        coupon.max_discount_applicable = max_discount_applicable
-
-    if (stock_quantity):
-        coupon.stock_quantity = stock_quantity
-
-    if (limit_per_user):
-        coupon.limit_per_user = limit_per_user
+    return (True, f"Updated Coupon {coupon_id}")
 
 def delete_coupon(session: Session, coupon_id: int):
     coupon = session.query(coupon).filter_by(id=coupon_id).first()
@@ -66,7 +97,7 @@ def delete_coupon(session: Session, coupon_id: int):
         return (False, 'Coupon does not exist')
     session.delete(coupon)
     session.commit()
-    return (True, "Deleted coupon {}".format(coupon_id))
+    return (True, "Deleted Coupon {}".format(coupon_id))
 
 def validate_coupon(session: Session, coupon_code: str, current_user: User, total_cost: float):
     if coupon_code == "":

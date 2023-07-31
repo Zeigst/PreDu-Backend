@@ -17,6 +17,9 @@ def add_used_coupon(session: Session, user: User, coupon: Coupon, order: Order, 
     )
 
     session.add(used_coupon)
+
+    oldcoupon = session.query(Coupon).filter_by(id=coupon.id).first()
+    oldcoupon.stock_quantity -= 1
     session.flush()
     session.commit()
     return (True, f"Add Used Coupon {used_coupon.id}")

@@ -1,6 +1,12 @@
 import datetime
 from models import *
 
+from pydantic import BaseModel
+
+class OrderInput(BaseModel):
+    cart: dict
+    coupon_code: str
+
 class OrderOutput:
     id: int
     user_id: int  

@@ -3,6 +3,13 @@ from models import Coupon
 
 class CouponInput(BaseModel):
     code: str
+    type: str
+    value: float
+    min_order_required: float
+    max_discount_applicable: float
+    stock_quantity: int
+    limit_per_user: int
+    is_active: bool
 
 class CouponOutput:
     id: int

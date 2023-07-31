@@ -2,7 +2,7 @@ from models import *
 from sqlalchemy.orm import Session
 from services.products import get_product_by_id, check_stock
 from services.coupons import get_coupon_by_code, validate_coupon, get_discount_value
-from services.ordered_products import add_ordered_product, get_ordered_products_by_order_id
+from services.ordered_products import add_ordered_product, get_ordered_products_by_order_id, cancel_ordered_product
 from services.used_coupons import add_used_coupon, get_used_coupon_by_order_id
 
 
@@ -170,6 +170,26 @@ def cancel_order(session: Session, user: User, order_id: int):
         return (False, "Order Already Completed")
     
     order.status = "canceled"
+    success, ordered_products = get_ordered_products_by_order_id(session=session, order_id=order_id)
+    for ordered_product in ordered_products:
+        success, data = cancel_ordered_product(session=session, ordered_product=ordered_product)
+
     session.commit()
     return (True, "Order Canceled")
+
+def complete_order(session: Session, order_id: int):
+    order = session.query(Order).filter_by(id=order_id).first()
+    if not order:
+        return (False, "Order Do Not Exist")
+    if order.status == "canceled":
+        return (False, "Order Already Canceled")
+    if order.status == "completed":
+        return (False, "Order Already Completed")
     
+    order.status = "completed"
+    session.commit()
+    return (True, "Order Completed")
+    
+def get_orders(session: Session):
+    orders = session.query(Order).order_by(Order.id.asc()).all()
+    return (True, orders)
