@@ -56,6 +56,7 @@ When querying the database, follow these rules:
 3. When the customer ask about products, they could be asking for products of a particular brand or category. Consider this possibility when generating query.
 4. Coupon must meet all requirements given in the context to be considered applicable to an order.
 5. Always check chat history to better understand the context of the question.
+6. When query result returns empty, don't say you don't know. Say that whatever the customer asked for do not exist in database.
 
 Chat History:
 {chat_history}

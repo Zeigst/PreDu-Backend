@@ -22,7 +22,7 @@ async def login(input: LoginInput, session: Session = Depends(get_session)):
         )
     return LoginOutput(access_token=data, token_type="bearer")
 
-@router.post("/change-password")
+@router.patch("/change-password")
 async def changePassword(input: ChangePasswordInput, session: Session = Depends(get_session), current_user: User = Depends(get_current_user)):
     success, data = change_password(session, current_user, input.current_password, input.new_password, input.confirm_password)
     if not success:
@@ -33,7 +33,7 @@ async def changePassword(input: ChangePasswordInput, session: Session = Depends(
         )
     return ChangePasswordOutput(message=data)
 
-@router.post("/change-username")
+@router.patch("/change-username")
 async def changeUsername(input: ChangeUsernameInput, session: Session = Depends(get_session), current_user: User = Depends(get_current_user)):
     success1, data1 = change_username(session, current_user, input.new_username, input.password)
     if not success1:

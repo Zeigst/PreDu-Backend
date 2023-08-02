@@ -15,12 +15,12 @@ async def get_all_categories(session: Session = Depends(get_session)):
     success, data = categories.get_all_categories(session)
     return data
 
-@router.get("/brands/{category_id}")
+@router.get("/{category_id}/brands")
 async def get_brands(category_id: int, session: Session = Depends(get_session)):
     success, data = categories.get_brands(session, category_id)
     return data
 
-@router.patch("/{category_id}", dependencies=[Depends(authorize_admin_access)])
+@router.put("/{category_id}", dependencies=[Depends(authorize_admin_access)])
 async def update_category(input: CategoryInput, category_id: int, session: Session = Depends(get_session), current_user: User = Depends(get_current_user)):
     success, data = categories.update_category(session=session, category_id=category_id, name=input.name, description=input.description)
     if success:

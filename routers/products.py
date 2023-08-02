@@ -13,7 +13,7 @@ async def get_all_products(session: Session = Depends(get_session)):
     success, data = products.get_all_products(session)
     return data
 
-@router.patch("/{product_id}", dependencies=[Depends(authorize_admin_access)])
+@router.put("/{product_id}", dependencies=[Depends(authorize_admin_access)])
 async def update_product(input: ProductInput, product_id: int, session: Session = Depends(get_session)):
     success, data = products.update_product(session=session, product_id=product_id, name=input.name, description=input.description,
                                              image=input.image, category_id=input.category_id, brand_id=input.brand_id, 

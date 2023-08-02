@@ -13,7 +13,7 @@ async def get_all_brands(session: Session = Depends(get_session)):
     success, data = brands.get_all_brands(session)
     return data
 
-@router.patch("/{brand_id}", dependencies=[Depends(authorize_admin_access)])
+@router.put("/{brand_id}", dependencies=[Depends(authorize_admin_access)])
 async def update_brand(input: BrandInput, brand_id: int, session: Session = Depends(get_session), current_user: User = Depends(get_current_user)):
     success, data = brands.update_brand(session=session, brand_id=brand_id, name=input.name, description=input.description)
     if success:

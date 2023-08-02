@@ -3,3 +3,4 @@ sqlalchemy
 jwt
 passlib
 python-jose
+langchain

@@ -46,13 +46,15 @@ def chat_layer_2(question: str, chat_history: list) -> str:
     except Exception as e:
         response = str(e)
         if response.startswith("Could not parse LLM output: `"):
-            response = "Something went wrong. Please rephrase your question."
-	
+            prefix = "Could not parse LLM output: `"
+            response = response[len(prefix):]
+    
     return response
 
 async def chat_layer_2_async_wrapper(question: str, chat_history: list) -> str:
     loop = asyncio.get_event_loop()
     response = await loop.run_in_executor(None, chat_layer_2, question, chat_history)
+    # response = asyncio.to_thread(chat_layer_2, question, chat_history)
     return response
 
 async def chat_layer_1(question: str, chat_history: list) -> str:
