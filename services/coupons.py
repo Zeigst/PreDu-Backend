@@ -92,7 +92,7 @@ def update_coupon(session: Session, coupon_id: int, code: str, type: str, value:
     return (True, f"Updated Coupon {coupon_id}")
 
 def delete_coupon(session: Session, coupon_id: int):
-    coupon = session.query(coupon).filter_by(id=coupon_id).first()
+    coupon = session.query(Coupon).filter_by(id=coupon_id).first()
     if not coupon:
         return (False, 'Coupon does not exist')
     session.delete(coupon)

@@ -31,3 +31,11 @@ def get_used_coupon_by_order_id(session: Session, order_id: int):
 def get_user_used_coupons(session: Session, user: User):
     used_coupons = session.query(UsedCoupon).filter_by(user_id=user.id).order_by(UsedCoupon.created_at.desc()).all()
     return (True, used_coupons)
+
+def cancle_used_coupon(session: Session, used_coupon: UsedCoupon):
+    coupon = session.query(Coupon).filter_by(id=used_coupon.coupon_id).first()
+    if coupon:
+        coupon.stock_quantity += 1
+
+    session.commit()
+    return (True, "Cancled Used Coupon")

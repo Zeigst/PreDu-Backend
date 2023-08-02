@@ -221,14 +221,14 @@ def seedUsers(session: Session):
     admin = session.query(User).filter_by(username="admin").first()
     if  not admin:
         admin = User(username="admin", firstname="admin", lastname="admin", password=get_password_hash("admin"), 
-                     phone="0911223333", email="admin@mail.com", location="Admin Home", role="admin", currently_active=True)
+                     phone="0911223333", email="admin@mail.com", location="Admin Home", role="admin")
         session.add(admin)
         session.commit()
     
     user = session.query(User).filter_by(username="user").first()
     if  not user:
         user = User(username="user", firstname="user", lastname="user", password=get_password_hash("user"), 
-                    phone="0944556666", email="user@mail.com", location="User Home", role="user", currently_active=False)
+                    phone="0944556666", email="user@mail.com", location="User Home", role="user")
         session.add(user)
         session.commit()
 

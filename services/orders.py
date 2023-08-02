@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from services.products import get_product_by_id, check_stock
 from services.coupons import get_coupon_by_code, validate_coupon, get_discount_value
 from services.ordered_products import add_ordered_product, get_ordered_products_by_order_id, cancel_ordered_product
-from services.used_coupons import add_used_coupon, get_used_coupon_by_order_id
+from services.used_coupons import add_used_coupon, get_used_coupon_by_order_id, cancle_used_coupon
 
 
 def validate_cart(session: Session, cart: dict):
@@ -173,6 +173,9 @@ def cancel_order(session: Session, user: User, order_id: int):
     success, ordered_products = get_ordered_products_by_order_id(session=session, order_id=order_id)
     for ordered_product in ordered_products:
         success, data = cancel_ordered_product(session=session, ordered_product=ordered_product)
+
+    success, used_coupon = get_used_coupon_by_order_id(session=session, order_id=order_id)
+    success, data = cancle_used_coupon(session=session, used_coupon=used_coupon)
 
     session.commit()
     return (True, "Order Canceled")

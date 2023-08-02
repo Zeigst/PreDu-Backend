@@ -20,7 +20,7 @@ async def make_order(input: OrderInput, session: Session = Depends(get_session),
             detail=data,
             headers={"WWW-Authenticate": "Bearer"},
         )
-    return data
+    return {"message":data}
 
 @router.get("/{order_id}")
 async def get_order_by_id(order_id: int, session: Session = Depends(get_session), current_user: User = Depends(get_current_user)):

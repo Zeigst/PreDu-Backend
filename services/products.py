@@ -89,3 +89,11 @@ def add_product(session: Session, name: str, description: str, image: str, categ
     session.add(new_product)
     session.commit()
     return (True, f"Created Product {name}")
+
+def delete_product(session: Session, product_id: int):
+    product = session.query(Product).filter_by(id=product_id).first()
+    if not product:
+        return (False, 'Product Does Not Exist')
+    session.delete(product)
+    session.commit()
+    return (True, "Deleted Product {}".format(product_id))

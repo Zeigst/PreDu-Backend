@@ -9,7 +9,7 @@ from services import users, orders, used_coupons
 
 router = APIRouter(prefix="/api/users", tags=["users"])
 
-@router.post("/signup")
+@router.post("/")
 async def signup(input: UserSignupInput, session: Session = Depends(get_session)):
     success, data = users.add_user(session, input.username, input.password, input.confirm_password,
                                   input.firstname, input.lastname, input.phone, input.email, input.location, "user")
@@ -19,7 +19,7 @@ async def signup(input: UserSignupInput, session: Session = Depends(get_session)
             detail=data,
             headers={"WWW-Authenticate": "Bearer"},
         )
-    return data
+    return {"message": data}
 
 @router.patch("/update-user")
 async def update_user(input: UpdateUserInput, session: Session = Depends(get_session), current_user: User = Depends(get_current_user)):

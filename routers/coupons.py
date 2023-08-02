@@ -26,7 +26,7 @@ async def get_all_coupons(session: Session = Depends(get_session)):
     success, data = coupons.get_all_coupons(session=session)
     return data
 
-@router.patch("/{coupon_id}", dependencies=[Depends(authorize_admin_access)])
+@router.put("/{coupon_id}", dependencies=[Depends(authorize_admin_access)])
 async def update_coupon(input: CouponInput, coupon_id: int, session: Session = Depends(get_session), current_user: User = Depends(get_current_user)):
     success, data = coupons.update_coupon(session=session, coupon_id=coupon_id, code=input.code, type=input.type, value=input.value, min_order_required=input.min_order_required,
                                            max_discount_applicable=input.max_discount_applicable, stock_quantity=input.stock_quantity, limit_per_user=input.limit_per_user, is_active=input.is_active)

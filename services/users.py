@@ -60,7 +60,7 @@ def add_user(session: Session, username: str, password: str, confirm_password: s
         return (False, 'Username already exists')
 
     new_user = User(username=username, password=auth.get_password_hash(password), firstname=firstname,
-                    lastname=lastname, phone=phone, email=email, location=location, role=role, currently_active=True)
+                    lastname=lastname, phone=phone, email=email, location=location, role=role)
     session.add(new_user)
     session.commit()
     return (True, "Created User {}".format(username))

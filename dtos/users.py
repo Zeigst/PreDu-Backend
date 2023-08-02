@@ -11,7 +11,6 @@ class UserOutput:
     email: str
     location: str
     role: str
-    currently_active_active: bool
 
     def __init__(self, user: User):
         self.id = user.id
@@ -22,7 +21,6 @@ class UserOutput:
         self.email = user.email
         self.location = user.location
         self.role = user.role
-        self.currently_active = user.currently_active
 
 class UserSignupInput(BaseModel):
     firstname: str
