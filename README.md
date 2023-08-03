@@ -6,4 +6,4 @@ Developed using:
 - PostgreSQL
 - LangChain
 <br>
-See (https://github.com/Zeigst/PreDu-Frontend)https://github.com/Zeigst/PreDu-Frontend for the frontend.
+See https://github.com/Zeigst/PreDu-Frontend for the frontend.
