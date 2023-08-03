@@ -6,4 +6,4 @@ Developed using:
 - SQLAlchemy
 - PostgreSQL
 - LangChain
-# See [PreDu-Frontend](https://github.com/Zeigst/PreDu-Frontend)https://github.com/Zeigst/PreDu-Frontend for the frontend.
+\nSee (https://github.com/Zeigst/PreDu-Frontend)https://github.com/Zeigst/PreDu-Frontend for the frontend.
